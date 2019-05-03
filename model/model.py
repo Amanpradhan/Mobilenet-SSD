@@ -22,7 +22,7 @@ def _conv_block(inputs, filters, alpha, kernel=(3,3), strides=(1,1)):
     x = tf.pad(inputs, paddings=(1,1), name='conv1_pad')
     x = tf.layers.conv2d(x, filters, kernel, padding='valid', use_bias=False, strides=strides, name='conv1')
     x = tf.layers.batch_normalization(x, axis=channel_axis, name='conv1_bn')
-    //keras module
+    #keras module
     return Activation(relu6(x), name='conv1_relu')
 
 def _depthwise_conv_block(inputs, pointwise_conv_filters, alpha, depth_multiplier=1, strides=(1,1), block_id=1):
