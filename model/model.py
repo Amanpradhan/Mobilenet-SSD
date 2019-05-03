@@ -72,7 +72,7 @@ def SSD(input_shape, num_classes):
     x = _depthwise_conv_block(x, 64, alpha, depth_multiplier, block_id=1)
     x = _depthwise_conv_block(x, 128, alpha, depth_multiplier, strides=(2, 2), block_id=2)
     x = _depthwise_conv_block(x, 128, alpha, depth_multiplier, block_id=3)
-    x = _depthwise_conv_block(x, 256, alpha, depth_multiplier, strides=(2, 2), block_id=4)
+    x = _depthwise_conv_block(x, 256, alpha, depth_multiplier, strides=(2, 2), block_id=4) 
     x = _depthwise_conv_block(x, 256, alpha, depth_multiplier, block_id=5)
     x = _depthwise_conv_block(x, 512, alpha, depth_multiplier, strides=(2, 2), block_id=6)
     x = _depthwise_conv_block(x, 512, alpha, depth_multiplier, block_id=7)
@@ -103,7 +103,16 @@ def SSD(input_shape, num_classes):
     num_priors = 6
     x = tf.layers.conv2d(conv13, num_priors * 4, (1, 1), padding='same', name='conv13_mbox_loc')(conv13)
     conv13_mbox_loc = x
-    flatten = tf.layers.flatten()
+    flatten = tf.layers.flatten(conv13_mbox_loc, name='conv13_mbox_loc_flat')
+    conv13_mbox_loc_flat = tf.layers.flatten(conv13_mbox_loc_flat)
+    name = 'conv13_mbox_conf'
+    conv13_mbox_conf = tf.layers.conv2d(conv13, num_priors * num_classes, (1, 1), padding='same', name=name)
+    conv13_mbox_conf_flat = tf.layers.flatten(conv13_mbox_conf, name='conv13_mbox_conf_flat')
+    prior = PriorBox(img_size, 105.0, max_size=150.0, aspect_ratios=[2, 3], variances=[0.1, 0.1, 0.2, 0.2], name='conv13_mbox_priorbox')
+    conv13_mbox_priorbox = priorbox(conv13)
+    num_priors = 6
+
+    
 
 
 
