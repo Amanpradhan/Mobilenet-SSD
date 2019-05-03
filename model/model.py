@@ -112,7 +112,16 @@ def SSD(input_shape, num_classes):
     conv13_mbox_priorbox = priorbox(conv13)
     num_priors = 6
 
-    
+    x = tf.layers.conv2d(conv14_2, num_priors*4, (1,1), padding='same', name='conv14_2_mbox_loc')
+    conv14_2_mbox_loc = x
+    conv14_mbox_loc_flat = tf.layers.flatten(conv14_2_mbox_loc, name='conv14_2_mbox_loc_flat')
+    name = 'conv14_2_mbox_conf'
+    x = tf.layers.conv2d(conv14_2, num_priors * num_classes, (1, 1), paddng='same', name=name)
+    conv14_2_mbox_conf = x
+    conv14_2_mbox_conf_flat = tf.layers.flatten(conv14_2_mbox_loc, name='conv14_2_mbox_conf')
+    priorbox = PriorBox(img_size, 150, max_size=195.0, aspect_ratios=[2, 3], variances=[0.1, 0.1, 0.2, 0.2], name='conv14_2_mbox_priorbox')
+    conv14_2_mbox_priorbox = priorbox(conv14_2)
+    num_priors = 6
 
 
 
