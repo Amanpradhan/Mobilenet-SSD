@@ -142,8 +142,8 @@ def SSD(input_shape, num_classes):
     x = tf.layers.conv2d(conv16_2, num_priors*4, (1, 1), padding='same', name='name')
     conv16_2_mbox_conf = x
     conv16_2_mbox_flat = tf.layers.flatten(conv16_2_mbox_conf, name='conv16_2_mbox_conf_flat')
-    priorbox = PriorBox(img_size, 240.0, max_size=285.0, aspect_ratios=[2, 3], variances=[0.1, 0.1, 0.2, 0.2], name='conv16_2_mbox, priorbox')
-    conv16_2_mbox+priorbox = priorbox(conv16_2)
+    priorbox = PriorBox(img_size, 240.0, max_size=285.0, aspect_ratios=[2, 3], variances=[0.1, 0.1, 0.2, 0.2], name='conv16_2_mbox_priorbox')
+    conv16_2_mbox_priorbox = priorbox(conv16_2)
 
     num_priors = 6
     x = tf.layers.conv2d(conv17_2, num_priors*4, (1,1), padding='same', name='conv17_2_mbox_loc')
@@ -157,4 +157,6 @@ def SSD(input_shape, num_classes):
     conv17_2_mbox_priorbox = priorbox(conv17_2)
 
     #Error - keras module
-    mbox_loc = tf.concat([conv11_mbox_loc_flat, conv13_mbox_loc_flat, conv14_mbox_loc_flat])
+    mbox_loc = tf.concat([conv11_mbox_loc_flat, conv13_mbox_loc_flat, conv14_2_mbox_loc_flat, conv15_2_mbox_loc_flat, conv16_mbox_loc_flat, conv17_2_mbox_loc_flat], axis=1, name='mbox_loc')
+    mbox_conf = tf.concat([conv11_mbox_conf_flat, conv13_mbox_conf_flat, conv14_2_mbox_conf_flat, conv15_2_mbox_conf_flat, conv16_2_mbox_conf_flat, conv17_2_mbox_conf_flat], axis=1, name='mbox_conf')
+    mbox_priorbox = tf.concat([conv11_mbox_priorbox, conv13_mbox_priorbox, conv14_2_mbox_priorbox, conv15_2_mbox_priorbox, conv16])
