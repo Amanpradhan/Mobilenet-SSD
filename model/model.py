@@ -52,7 +52,7 @@ def _conv_blockSSD_f(inputs, filters, alpha, kernel, strides, block_id=11):
 def _conv_blockSSD(inputs, filters, alpha, block_id=11):
     channel_axis = -1
     filters = int(filters * alpha)
-    x = tf.pad(inputs, paddings=(1,1), name='conv_pad_#d_1' % block_id)
+    x = tf.pad(inputs, paddings=(1,1), name='conv_pad_%d_1' % block_id)
     #Error - no kernel_size defined
     x = tf.layers.conv2d(x, filters, padding='valid', use_bias=False, strides=(1,1), name='conv_%d_1' % block_id)
     x = tf.layers.batch_normalization(x, axis=channel_axis, name='conv_%d_bn_1' % block_id)
@@ -68,6 +68,7 @@ def SSD(input_shape, num_classes):
     alpha = 1.0
     depth_multiplier = 1
     input0 = Input(input_shape)
+    #Possible bug - check the architecture again
     x = _conv_block(input0, 32, alpha, strides=(2, 2))
     x = _depthwise_conv_block(x, 64, alpha, depth_multiplier, block_id=1)
     x = _depthwise_conv_block(x, 128, alpha, depth_multiplier, strides=(2, 2), block_id=2)
@@ -114,7 +115,7 @@ def SSD(input_shape, num_classes):
 
     x = tf.layers.conv2d(conv14_2, num_priors*4, (1,1), padding='same', name='conv14_2_mbox_loc')
     conv14_2_mbox_loc = x
-    conv14_mbox_loc_flat = tf.layers.flatten(conv14_2_mbox_loc, name='conv14_2_mbox_loc_flat')
+    conv14_2_mbox_loc_flat = tf.layers.flatten(conv14_2_mbox_loc, name='conv14_2_mbox_loc_flat')
     name = 'conv14_2_mbox_conf'
     x = tf.layers.conv2d(conv14_2, num_priors * num_classes, (1, 1), paddng='same', name=name)
     conv14_2_mbox_conf = x
@@ -123,9 +124,37 @@ def SSD(input_shape, num_classes):
     conv14_2_mbox_priorbox = priorbox(conv14_2)
     num_priors = 6
 
+    x = tf.layers.conv2d(conv15_2, num_priors * 4, (1, 1), padding='same', name='conv15_2_mbox_loc')
+    conv15_2_mbox_loc = x
+    conv15_mbox_loc_flat = tf.layers.flatten(conv15_2_mbox_loc, name='conv15_2_mbox_loc_flat')
+    name = 'conv15_2_mbox_mbox_conf'
+    x = tf.layers.conv2d(conv15_2, num_priors*num_classes, (1, 1), padding='same', name=name)
+    conv15_2_mbox_conf = x
+    conv15_2_mbox_conf_flat = tf.layers.flatten(conv15_2_mbox_conf, name='conf15_2_mbox_conf_flat')
+    priorbox = PriorBox[img_size, 195.0, max_size=240.0, aspect_ratios=[2, 3]. variances=[0.1, 0.1, 0.2, 0.2], name='conv15_2_mbox_priorbox']
+    conv15_2_mbox_priorbox = priorbox(conv15_2)
+    num_priors = 6
 
+    x = tf.layers.conv2d(conv16_2, num_priors*4, (1,1), padding='same', name='conv16_2_mbox_loc')
+    conv16_2_mbox_loc = x
+    conv16_2_mbox_loc_flat = tf.layers.flatten(conv16_2_mbox, loc, name='conv16_2_mbox_loc')
+    name = 'conv16_2_mbox_conf'
+    x = tf.layers.conv2d(conv16_2, num_priors*4, (1, 1), padding='same', name='name')
+    conv16_2_mbox_conf = x
+    conv16_2_mbox_flat = tf.layers.flatten(conv16_2_mbox_conf, name='conv16_2_mbox_conf_flat')
+    priorbox = PriorBox(img_size, 240.0, max_size=285.0, aspect_ratios=[2, 3], variances=[0.1, 0.1, 0.2, 0.2], name='conv16_2_mbox, priorbox')
+    conv16_2_mbox+priorbox = priorbox(conv16_2)
 
-        
+    num_priors = 6
+    x = tf.layers.conv2d(conv17_2, num_priors*4, (1,1), padding='same', name='conv17_2_mbox_loc')
+    conv17_2_mbox_loc = x
+    conv17_2_mbox_loc_flat = tf.conv2d.flatten(conv17_2_mbox_loc, name='conv17_2_mbox_loc_flat')
+    name = 'conv17_2_mbox_conf'
+    x = tf.layers.conv2d(conv17_2, num_priors * num_classes, (1, 1), padding='same', name=name)
+    conv17_2_mbox_conf = x
+    conv17_2_mbox_conf_flat = tf.layers.flatten(conv17_2_mbox_conf, name='conv17_2_mbox_conf_flat')
+    priorbox = PriorBox(img_size, 285.0, max_size=300, aspect_ratios=[2, 3], variances=[0.1, 0.1, 0.2, 0.2], name='conv17_2_mbox_priorbox')
+    conv17_2_mbox_priorbox = priorbox(conv17_2)
 
-
-
+    #Error - keras module
+    mbox_loc = tf.concat([conv11_mbox_loc_flat, conv13_mbox_loc_flat, conv14_mbox_loc_flat])
