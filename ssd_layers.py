@@ -86,4 +86,16 @@ class PriorBox(Layer):
                 box_widths.append(np.sqrt(self.min_size * self.max_size))                                                 
                 box_heights.append(np.sqrt(self.min_size * self.max_size))
             elif ar != 1:
-                box_widths.append(np.sqrt(self.min_size * np.s))     
+                box_widths.append(self.min_size * np.sqrt(ar))
+                box_heights.append(self.min_size / np.sqrt(ar))
+            box_widths = 0.5 * np.array(box_widths)
+            box_heights = 0.5 * np.array(box_heights)
+            #define centers of prior boxes
+            step_x = img_width / layer_width
+            step_y = img_height / layer_height
+            linx = np.linspace(0.5 * step_x, img_width - 0.5 * step_x, layer_width)
+            liny = np.linspace(0.5 * step_y, img_height - 0.5 * step_y, layer_height)
+            centers_x, centers_y = np.meshgrid(linx, liny)
+            centers_x = centers_x.reshape(-1, 1)
+            centers_y = centers_y.reshape(-1, 1)
+                     
