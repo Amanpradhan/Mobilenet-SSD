@@ -4,16 +4,17 @@ from __future__ import division
 import os
 import warnings
 import tensorflow as tf
-from keras.applications import imagenet_utils
-from keras.layers import Activation
-from keras.layers import Input
+from tensorflow.python.keras.applications import imagenet_utils
+from tensorflow.python.keras.layers import Activation
+from tensorflow.python.keras.layers import Input
 
 def relu6(x):
     return tf.nn.relu6(x)
 
 #Error - keras module
 def preprocess_input(x):
-    return imagenet_utils.preprocess_input(x, mode='tf')
+    # return imagenet_utils.preprocess_input(x, mode='tf')
+    return imagenet_utils.preprocess_input(x)
 
 #Insight - understand difference between kernel and filter
 def _conv_block(inputs, filters, alpha, kernel=(3,3), strides=(1,1)):
@@ -23,6 +24,7 @@ def _conv_block(inputs, filters, alpha, kernel=(3,3), strides=(1,1)):
     x = tf.layers.conv2d(x, filters, kernel, padding='valid', use_bias=False, strides=strides, name='conv1')
     x = tf.layers.batch_normalization(x, axis=channel_axis, name='conv1_bn')
     #keras module
+    # return Activation(relu6(x), name='conv1_relu')
     return Activation(relu6(x), name='conv1_relu')
 
 def _depthwise_conv_block(inputs, pointwise_conv_filters, alpha, depth_multiplier=1, strides=(1,1), block_id=1):
@@ -67,7 +69,9 @@ def SSD(input_shape, num_classes):
     input_shape = (input_shape[1], input_shape[0], 3)
     alpha = 1.0
     depth_multiplier = 1
+    # input0 = Input(input_shape)
     input0 = Input(input_shape)
+
     #Possible bug - check the architecture again
     x = _conv_block(input0, 32, alpha, strides=(2, 2))
     x = _depthwise_conv_block(x, 64, alpha, depth_multiplier, block_id=1)
@@ -156,7 +160,20 @@ def SSD(input_shape, num_classes):
     priorbox = PriorBox(img_size, 285.0, max_size=300, aspect_ratios=[2, 3], variances=[0.1, 0.1, 0.2, 0.2], name='conv17_2_mbox_priorbox')
     conv17_2_mbox_priorbox = priorbox(conv17_2)
 
-    #Error - keras module
     mbox_loc = tf.concat([conv11_mbox_loc_flat, conv13_mbox_loc_flat, conv14_2_mbox_loc_flat, conv15_2_mbox_loc_flat, conv16_mbox_loc_flat, conv17_2_mbox_loc_flat], axis=1, name='mbox_loc')
     mbox_conf = tf.concat([conv11_mbox_conf_flat, conv13_mbox_conf_flat, conv14_2_mbox_conf_flat, conv15_2_mbox_conf_flat, conv16_2_mbox_conf_flat, conv17_2_mbox_conf_flat], axis=1, name='mbox_conf')
-    mbox_priorbox = tf.concat([conv11_mbox_priorbox, conv13_mbox_priorbox, conv14_2_mbox_priorbox, conv15_2_mbox_priorbox, conv16])
+    mbox_priorbox = tf.concat([conv11_mbox_priorbox, conv13_mbox_priorbox, conv14_2_mbox_priorbox, conv15_2_mbox_priorbox, conv16_2_mbox_priorbox, conv17_2_mbox_priorbox], axis=1, name='mbox_priorbox')
+    #Error - keras module
+    if hasattr(mbox_loc, '_keras_shape_'):
+        num_boxes = mbox_loc._keras_shape[-1] // 4
+    elif hasattr(mbox_loc, int_shape):
+        num_boxes = K.int_shape(mbox_loc)[-1] // 4
+    mbox_loc = tf.reshape(mbox_loc, (num_boxes, 4), name='mbox_conf_logits')
+    mbox_conf = tf.reshape(mbox_conf, (num_boxes, num_classes), name='mbox_conf_logits')    
+    #Error - keras module
+    mbox_conf = Activation('softmax', name='mbox_conf_final')(mbox_conf)
+    predictions = tf.concat([mbox_loc, mbox_conf, mbox_priorbox], axis=2, name='predictions')
+    #Integrate tensorflow based model
+    model = Model(inputs=input0, outputs=predictions)
+    return model
+
