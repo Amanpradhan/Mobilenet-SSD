@@ -1,6 +1,6 @@
-import keras.backend as K 
-from keras.engine.topology import InputSpec
-from keras.engine.topology import Layer
+import tensorflow.python.keras.backend as K 
+from tensorflow.python.keras.engine.topology import InputSpec
+from tensorflow.python.keras.engine.topology import Layer
 import numpy as np 
 import tensorflow as tf 
 
@@ -126,5 +126,5 @@ class PriorBox(Layer):
                 prior_boxes_tensor = tf.pile(prior_boxes_tensor, pattern)
 
             return prior_boxes_tensor
-            
+
 
