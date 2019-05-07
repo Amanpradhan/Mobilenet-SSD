@@ -1,6 +1,6 @@
-import tensorflow.python.keras.backend as K 
-from tensorflow.python.keras.engine.topology import InputSpec
-from tensorflow.python.keras.engine.topology import Layer
+import tensorflow.keras.backend as K 
+from tensorflow.python.keras.layers import InputSpec
+from tensorflow.python.keras.layers import Layer
 import numpy as np 
 import tensorflow as tf 
 
@@ -30,10 +30,13 @@ class PriorBox(Layer):
 
     def __init__(self, img_size, min_size=None, max_size=None, aspect_ratios=None,
                 flip=True, variances=[0.1], clip=True, **kwargs):
+        # if K.image_dim_ordering() == 'tf':
+        #     self.waxis = 2
+        #     self.haxis = 1
+
         if K.image_dim_ordering() == 'tf':
             self.waxis = 2
             self.haxis = 1
-
         else:
             self.waxis = 3
             self.haxis = 2

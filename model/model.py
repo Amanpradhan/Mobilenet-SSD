@@ -36,7 +36,7 @@ def _depthwise_conv_block(inputs, pointwise_conv_filters, alpha, depth_multiplie
     x = tf.layers.batch_normalization(x, axis=channel_axis, name='conv_dw_%d_bn' % block_id)
     return Activation(relu6(x), name='conv_dw_%d_relu' %block_id)
 
-def _depthwise_conv_block_f(inputs, depth_multiplier=1, strides=(1,1), strides=(1,1), block_id=1):
+def _depthwise_conv_block_f(inputs, depth_multiplier=1, strides=(1,1), block_id=1):
     channel_axis = -1
     x = tf.pad(inputs, paddings=(1,1), name='conv_pad_%d' % block_id)
     x = tf.keras.layers.DepthwiseConv2D(kernel_size=(3,3), padding='valid', depth_multiplier=depth_multiplier, strides=strides, use_bias=False)(x)
@@ -135,7 +135,7 @@ def SSD(input_shape, num_classes):
     x = tf.layers.conv2d(conv15_2, num_priors*num_classes, (1, 1), padding='same', name=name)
     conv15_2_mbox_conf = x
     conv15_2_mbox_conf_flat = tf.layers.flatten(conv15_2_mbox_conf, name='conf15_2_mbox_conf_flat')
-    priorbox = PriorBox[img_size, 195.0, max_size=240.0, aspect_ratios=[2, 3]. variances=[0.1, 0.1, 0.2, 0.2], name='conv15_2_mbox_priorbox']
+    priorbox = PriorBox(img_size, 195.0, max_size=240.0, aspect_ratios=[2, 3], variances=[0.1, 0.1, 0.2, 0.2], name='conv15_2_mbox_priorbox')
     conv15_2_mbox_priorbox = priorbox(conv15_2)
     num_priors = 6
 
