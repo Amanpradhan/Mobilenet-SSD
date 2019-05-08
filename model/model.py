@@ -1,10 +1,11 @@
+
 from __future__ import print_function
 from __future__ import absolute_import
 from __future__ import division
 import os
 import warnings
 import tensorflow as tf
-from tensorflow.python.keras.applications import imagenet_utils
+from tensorflow.python.keras.applications.mobilenet import preprocess_input
 from tensorflow.python.keras.layers import Activation
 from tensorflow.python.keras.layers import Input
 
@@ -14,7 +15,7 @@ def relu6(x):
 #Error - keras module
 def preprocess_input(x):
     # return imagenet_utils.preprocess_input(x, mode='tf')
-    return imagenet_utils.preprocess_input(x)
+    return preprocess_input(x)
 
 #Insight - understand difference between kernel and filter
 def _conv_block(inputs, filters, alpha, kernel=(3,3), strides=(1,1)):

@@ -11,7 +11,7 @@ class MultiboxLoss(object):
         negatives_for_hard: Number of negative boxes to consider
             it there is no positive boxes in batch.
     # References
-        https://arxiv.org/abs/10512.02325
+        https://arxiv.org/abs/1512.02325
     # TODO
         Add possibility for background label id be not zero
     """
